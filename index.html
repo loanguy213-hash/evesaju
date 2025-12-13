@@ -25,6 +25,44 @@
   .half { flex:1; min-width:150px; }
   .muted { font-size:13px;color:#6b7280;margin-top:8px; }
   .hidden { display:none; }
+
+  /* ✅ 라디오/체크박스 정렬 핵심 */
+  .option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    margin: 10px 0;
+    padding: 10px 12px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    background:#fafafa;
+  }
+  .option input[type="radio"],
+  .option input[type="checkbox"]{
+    width:auto;
+    margin:0;
+    padding:0;
+  }
+  .option span{
+    font-weight:700;
+    color:#111827;
+  }
+
+  /* 유료 선택 박스 */
+  #paid-box{
+    margin-top:12px;
+    padding:14px;
+    border:1px dashed #d1d5db;
+    border-radius:14px;
+    background:#fff;
+  }
+  #paid-box .actions{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
 </style>
 </head>
 
@@ -104,25 +142,31 @@
   <div class="section">
     <h2>3. 리포트 선택</h2>
 
-    <label>
+    <label class="option">
       <input type="radio" name="plan" value="FREE" checked>
-      무료 접수
+      <span>무료 접수</span>
     </label>
 
-    <label>
+    <label class="option" style="background:#fff;">
       <input type="radio" name="plan" value="PAID">
-      유료 결론 리포트 (PDF) — $14.99
+      <span>유료 결론 리포트 (PDF) — $14.99</span>
     </label>
 
     <div id="paid-box" class="hidden">
-      <button type="button" class="primary" id="btnPay" style="background:#111827;">
-        Stripe 결제하기 →
-      </button>
+      <div class="actions">
+        <button type="button" class="primary" id="btnPay" style="background:#111827;">
+          Stripe 결제하기 →
+        </button>
 
-      <label style="margin-top:10px;">
-        <input type="checkbox" id="chkPaidConfirm">
-        결제를 완료했습니다
-      </label>
+        <label class="option" style="border:none;background:transparent;padding:0;margin:0;">
+          <input type="checkbox" id="chkPaidConfirm">
+          <span style="font-weight:700;">결제를 완료했습니다</span>
+        </label>
+      </div>
+
+      <p class="muted" style="margin-top:10px;">
+        결제 후 체크하시면 전송 버튼이 활성화됩니다.
+      </p>
     </div>
 
     <input type="hidden" name="paid_confirm" id="paid_confirm" value="NO" />
@@ -190,6 +234,14 @@
       e.preventDefault();
       alert("결제 후 '결제를 완료했습니다'에 체크해주세요.");
     }
+  });
+
+  form.addEventListener('reset', () => {
+    setTimeout(() => {
+      chkPaid.checked = false;
+      syncGuess();
+      syncPay();
+    }, 0);
   });
 
   syncGuess();
