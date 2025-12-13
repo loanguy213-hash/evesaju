@@ -105,7 +105,8 @@
     <h2>3. 리포트 선택</h2>
 
     <label>
-      <input type="radio" name="plan" value="FREE" checked> 무료 접수
+      <input type="radio" name="plan" value="FREE" checked>
+      무료 접수
     </label>
 
     <label>
@@ -151,8 +152,10 @@
   const paidHidden = document.getElementById('paid_confirm');
   const btnPay = document.getElementById('btnPay');
 
- https://buy.stripe.com/test_3cI4gB2EZ2PIfSW2A1cjS01 
- function syncGuess() {
+  // ✅ Stripe Payment Link (TEST MODE)
+  const PAYMENT_LINK = "https://buy.stripe.com/test_3cI4gB2EZ2PIfSW2A1cjS01";
+
+  function syncGuess() {
     guess.classList.toggle('hidden', !!birthTime.value);
   }
 
@@ -180,9 +183,12 @@
   });
 
   form.addEventListener('submit', e => {
-    if (paidHidden.value === "NO" && document.querySelector('input[name="plan"]:checked').value === "PAID") {
+    if (
+      document.querySelector('input[name="plan"]:checked').value === "PAID" &&
+      paidHidden.value === "NO"
+    ) {
       e.preventDefault();
-      alert("결제 후 체크해주세요.");
+      alert("결제 후 '결제를 완료했습니다'에 체크해주세요.");
     }
   });
 
