@@ -23,7 +23,7 @@
   .secondary { background:#e5e7eb; }
   .row { display:flex; gap:12px; flex-wrap:wrap; }
   .half { flex:1; min-width:150px; }
-  .muted { font-size:13px;color:#6b7280;margin-top:-10px;margin-bottom:10px; }
+  .muted { font-size:13px;color:#6b7280;margin-top:8px; }
   .hidden { display:none; }
 </style>
 </head>
@@ -36,15 +36,10 @@
       action="https://formspree.io/f/xzznkvag"
       method="POST">
 
-  <!-- Formspree 옵션 -->
   <input type="hidden" name="_subject" value="EVE 사주 상담 신청 접수" />
+  <input type="text" name="_gotcha" style="display:none" />
 
-  <!-- 스팸봇 차단 허니팟 -->
-  <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
-
-  <!-- ========================= -->
   <!-- 1. 기본 정보 -->
-  <!-- ========================= -->
   <div class="section">
     <h2>1. 기본 정보</h2>
 
@@ -56,37 +51,9 @@
 
     <div class="row">
       <div class="half">
-        <label>성별</label>
-        <select name="gender" required>
-          <option value="">선택</option>
-          <option value="남">남</option>
-          <option value="여">여</option>
-          <option value="기타/비공개">기타 / 비공개</option>
-        </select>
-      </div>
-
-      <div class="half">
         <label>생년월일</label>
-
-        <!-- 사용자 입력 -->
-        <input
-          type="text"
-          id="birth_date_ui"
-          name="birth_date_ui"
-          placeholder="YYYY/MM/DD  예) 1987/03/14"
-          inputmode="numeric"
-          autocomplete="bday"
-          required
-        />
-
-        <!-- 서버 전송용 -->
-        <input type="hidden" id="birth_date" name="birth_date" />
-
-        <div class="muted">※ 숫자만 입력해도 / 가 자동으로 들어갑니다</div>
+        <input type="date" name="birth_date" required>
       </div>
-    </div>
-
-    <div class="row">
       <div class="half">
         <label>출생시간</label>
         <select name="birth_time" id="birth_time">
@@ -108,41 +75,62 @@
     </div>
   </div>
 
-  <!-- ========================= -->
   <!-- 2. 시주 추정 -->
-  <!-- ========================= -->
   <div class="section" id="guess-section">
-    <h2>2. 시주 미상일 경우 — 시주 추정 테스트</h2>
+    <h2>2. 시주 미상 — 성향 기반 추정</h2>
 
-    <label><b>1차 질문 — 전반적인 기질</b></label>
+    <label><b>1차 질문</b></label>
     <select id="test_q1" name="test_q1">
       <option value="">선택</option>
-      <option value="자">① 분석·계산 빠름 / 야행성 / 집요함</option>
-      <option value="묘">② 관계·조율 중심 / 말이 부드러움</option>
-      <option value="오">③ 밝고 드러남 / 리더·표현형</option>
-      <option value="유">④ 꼼꼼·완성도 / 체면 중시</option>
+      <option value="자">분석·집요</option>
+      <option value="묘">관계·조율</option>
+      <option value="오">표현·리더</option>
+      <option value="유">완성·체면</option>
     </select>
 
-    <label><b>2차 질문 — 인간관계 스타일</b></label>
+    <label><b>2차 질문</b></label>
     <select id="test_q2" name="test_q2">
       <option value="">선택</option>
-      <option value="이동형">A. 이동·변화 선호</option>
-      <option value="조율형">B. 관계·중재 우선</option>
-      <option value="직선형">C. 직설·표현형</option>
-      <option value="완성형">D. 완성도·체면 중시</option>
+      <option value="A">이동·유연</option>
+      <option value="B">중재·관계</option>
+      <option value="C">직선·표현</option>
+      <option value="D">정밀·완성</option>
     </select>
 
-    <p class="muted">
-      ※ 시주 추정 참고용이며, 실제 해석은 전체 사주 구조 기준으로 판단합니다.
-    </p>
+    <p class="muted">※ 참고 자료로만 사용됩니다.</p>
   </div>
 
-  <!-- ========================= -->
-  <!-- 3. 메모 -->
-  <!-- ========================= -->
+  <!-- 3. 유료 리포트 옵션 -->
   <div class="section">
-    <h2>3. 추가 메모</h2>
-    <textarea name="memo" rows="4" placeholder="상담자에게 전하고 싶은 내용을 자유롭게 적어주세요."></textarea>
+    <h2>3. 리포트 선택</h2>
+
+    <label>
+      <input type="radio" name="plan" value="FREE" checked> 무료 접수
+    </label>
+
+    <label>
+      <input type="radio" name="plan" value="PAID">
+      유료 결론 리포트 (PDF) — $14.99
+    </label>
+
+    <div id="paid-box" class="hidden">
+      <button type="button" class="primary" id="btnPay" style="background:#111827;">
+        Stripe 결제하기 →
+      </button>
+
+      <label style="margin-top:10px;">
+        <input type="checkbox" id="chkPaidConfirm">
+        결제를 완료했습니다
+      </label>
+    </div>
+
+    <input type="hidden" name="paid_confirm" id="paid_confirm" value="NO" />
+  </div>
+
+  <!-- 4. 메모 -->
+  <div class="section">
+    <h2>4. 추가 메모</h2>
+    <textarea name="memo" rows="4"></textarea>
   </div>
 
   <div style="text-align:center;">
@@ -153,68 +141,54 @@
 
 <script>
   const form = document.getElementById('consult-form');
-  const birthTimeEl = document.getElementById('birth_time');
-  const guessSection = document.getElementById('guess-section');
-  const q1 = document.getElementById('test_q1');
-  const q2 = document.getElementById('test_q2');
+  const birthTime = document.getElementById('birth_time');
+  const guess = document.getElementById('guess-section');
   const submitBtn = document.getElementById('submitBtn');
 
-  // 시주 추정 토글
-  function syncGuessUI() {
-    if (!birthTimeEl.value) {
-      guessSection.classList.remove('hidden');
-      q1.required = true;
-      q2.required = true;
+  const planRadios = document.querySelectorAll('input[name="plan"]');
+  const paidBox = document.getElementById('paid-box');
+  const chkPaid = document.getElementById('chkPaidConfirm');
+  const paidHidden = document.getElementById('paid_confirm');
+  const btnPay = document.getElementById('btnPay');
+
+  const PAYMENT_LINK = "https://buy.stripe.com/XXXXXXXX"; // 🔴 교체
+
+  function syncGuess() {
+    guess.classList.toggle('hidden', !!birthTime.value);
+  }
+
+  function syncPay() {
+    const paid = document.querySelector('input[name="plan"]:checked').value === "PAID";
+    paidBox.classList.toggle('hidden', !paid);
+
+    if (paid) {
+      submitBtn.disabled = !chkPaid.checked;
+      submitBtn.textContent = chkPaid.checked ? "유료 리포트 요청" : "결제 후 전송 가능";
+      paidHidden.value = chkPaid.checked ? "YES" : "NO";
     } else {
-      guessSection.classList.add('hidden');
-      q1.required = false;
-      q2.required = false;
-      q1.value = "";
-      q2.value = "";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "분석 요청";
+      paidHidden.value = "NO";
     }
   }
-  syncGuessUI();
-  birthTimeEl.addEventListener('change', syncGuessUI);
 
-  // 생년월일 자동 슬래시 + ISO 변환
-  const birthUI = document.getElementById('birth_date_ui');
-  const birthHidden = document.getElementById('birth_date');
+  birthTime.addEventListener('change', syncGuess);
+  planRadios.forEach(r => r.addEventListener('change', syncPay));
+  chkPaid.addEventListener('change', syncPay);
 
-  birthUI.addEventListener('input', () => {
-    const digits = birthUI.value.replace(/\D/g,'').slice(0,8);
-    const y = digits.slice(0,4);
-    const m = digits.slice(4,6);
-    const d = digits.slice(6,8);
-
-    let out = y;
-    if (m) out += '/' + m;
-    if (d) out += '/' + d;
-    birthUI.value = out;
-
-    birthHidden.value = (y && m && d) ? `${y}-${m}-${d}` : '';
+  btnPay.addEventListener('click', () => {
+    window.open(PAYMENT_LINK, "_blank");
   });
 
-  // 제출 제어
-  form.addEventListener('submit', (e) => {
-    if (!birthHidden.value) {
+  form.addEventListener('submit', e => {
+    if (paidHidden.value === "NO" && document.querySelector('input[name="plan"]:checked').value === "PAID") {
       e.preventDefault();
-      birthUI.setCustomValidity('생년월일을 YYYY/MM/DD 형식으로 입력하세요.');
-      birthUI.reportValidity();
-      submitBtn.disabled = false;
-      submitBtn.textContent = "분석 요청";
-      return;
+      alert("결제 후 체크해주세요.");
     }
-    submitBtn.disabled = true;
-    submitBtn.textContent = "전송 중...";
   });
 
-  form.addEventListener('reset', () => {
-    setTimeout(() => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "분석 요청";
-      syncGuessUI();
-    }, 0);
-  });
+  syncGuess();
+  syncPay();
 </script>
 
 </body>
