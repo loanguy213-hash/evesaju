@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>사주 상담 신청 — EVE 사주 분석</title>
+
+<style>
+  body { font-family: sans-serif; background:#fafafa; padding:20px; }
+  h1 { text-align:center; color:#065f46; }
+  .section { background:#fff; padding:20px; border-radius:14px; border:1px solid #e5e7eb; margin-bottom:20px; }
+  label { font-weight:600; display:block; margin-bottom:6px; }
+  input, select, textarea {
+    width:100%; padding:10px; border:1px solid #d1d5db;
+    border-radius:8px; margin-bottom:15px;
+  }
+  button {
+    padding:12px 20px; border:none; border-radius:10px;
+    font-size:16px; cursor:pointer; font-weight:700;
+  }
+  button[disabled]{ opacity:.6; cursor:not-allowed; }
+  .primary { background:#10b981; color:white; }
+  .secondary { background:#e5e7eb; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  .half { flex:1; min-width:150px; }
+  .muted { font-size:13px;color:#6b7280;margin-top:8px; }
+  .hidden { display:none; }
+</style>
+</head>
+
+<body>
+
+<h1>사주 상담 신청</h1>
+
+<form id="consult-form"
+      action="https://formspree.io/f/xzznkvag"
+      method="POST">
+
+  <input type="hidden" name="_subject" value="EVE 사주 상담 신청 접수" />
+  <input type="text" name="_gotcha" style="display:none" />
+
+  <!-- 1. 기본 정보 -->
+  <div class="section">
+    <h2>1. 기본 정보</h2>
+
+    <label>성명</label>
+    <input type="text" name="name" required>
+
+    <label>이메일</label>
+    <input type="email" name="email" required>
+
+    <div class="row">
+      <div class="half">
+        <label>생년월일</label>
+        <input type="date" name="birth_date" required>
+      </div>
+      <div class="half">
+        <label>출생시간</label>
+        <select name="birth_time" id="birth_time">
+          <option value="">모름</option>
+          <option value="23-01">자(23~01)</option>
+          <option value="01-03">축(01~03)</option>
+          <option value="03-05">인(03~05)</option>
+          <option value="05-07">묘(05~07)</option>
+          <option value="07-09">진(07~09)</option>
+          <option value="09-11">사(09~11)</option>
+          <option value="11-13">오(11~13)</option>
+          <option value="13-15">미(13~15)</option>
+          <option value="15-17">신(15~17)</option>
+          <option value="17-19">유(17~19)</option>
+          <option value="19-21">술(19~21)</option>
+          <option value="21-23">해(21~23)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 시주 추정 -->
+  <div class="section" id="guess-section">
+    <h2>2. 시주 미상 — 성향 기반 추정</h2>
+
+    <label><b>1차 질문</b></label>
+    <select id="test_q1" name="test_q1">
+      <option value="">선택</option>
+      <option value="자">분석·집요</option>
+      <option value="묘">관계·조율</option>
+      <option value="오">표현·리더</option>
+      <option value="유">완성·체면</option>
+    </select>
+
+    <label><b>2차 질문</b></label>
+    <select id="test_q2" name="test_q2">
+      <option value="">선택</option>
+      <option value="A">이동·유연</option>
+      <option value="B">중재·관계</option>
+      <option value="C">직선·표현</option>
+      <option value="D">정밀·완성</option>
+    </select>
+
+    <p class="muted">※ 참고 자료로만 사용됩니다.</p>
+  </div>
+
+  <!-- 3. 유료 리포트 옵션 -->
+  <div class="section">
+    <h2>3. 리포트 선택</h2>
+
+    <label>
+      <input type="radio" name="plan" value="FREE" checked> 무료 접수
+    </label>
+
+    <label>
+      <input type="radio" name="plan" value="PAID">
+      유료 결론 리포트 (PDF) — $14.99
+    </label>
+
+    <div id="paid-box" class="hidden">
+      <button type="button" class="primary" id="btnPay" style="background:#111827;">
+        Stripe 결제하기 →
+      </button>
+
+      <label style="margin-top:10px;">
+        <input type="checkbox" id="chkPaidConfirm">
+        결제를 완료했습니다
+      </label>
+    </div>
+
+    <input type="hidden" name="paid_confirm" id="paid_confirm" value="NO" />
+  </div>
+
+  <!-- 4. 메모 -->
+  <div class="section">
+    <h2>4. 추가 메모</h2>
+    <textarea name="memo" rows="4"></textarea>
+  </div>
+
+  <div style="text-align:center;">
+    <button class="primary" id="submitBtn" type="submit">분석 요청</button>
+    <button class="secondary" type="reset">초기화</button>
+  </div>
+</form>
+
+<script>
+  const form = document.getElementById('consult-form');
+  const birthTime = document.getElementById('birth_time');
+  const guess = document.getElementById('guess-section');
+  const submitBtn = document.getElementById('submitBtn');
+
+  const planRadios = document.querySelectorAll('input[name="plan"]');
+  const paidBox = document.getElementById('paid-box');
+  const chkPaid = document.getElementById('chkPaidConfirm');
+  const paidHidden = document.getElementById('paid_confirm');
+  const btnPay = document.getElementById('btnPay');
+
+  const PAYMENT_LINK = "https://buy.stripe.com/XXXXXXXX"; // 🔴 교체
+
+  function syncGuess() {
+    guess.classList.toggle('hidden', !!birthTime.value);
+  }
+
+  function syncPay() {
+    const paid = document.querySelector('input[name="plan"]:checked').value === "PAID";
+    paidBox.classList.toggle('hidden', !paid);
+
+    if (paid) {
+      submitBtn.disabled = !chkPaid.checked;
+      submitBtn.textContent = chkPaid.checked ? "유료 리포트 요청" : "결제 후 전송 가능";
+      paidHidden.value = chkPaid.checked ? "YES" : "NO";
+    } else {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "분석 요청";
+      paidHidden.value = "NO";
+    }
+  }
+
+  birthTime.addEventListener('change', syncGuess);
+  planRadios.forEach(r => r.addEventListener('change', syncPay));
+  chkPaid.addEventListener('change', syncPay);
+
+  btnPay.addEventListener('click', () => {
+    window.open(PAYMENT_LINK, "_blank");
+  });
+
+  form.addEventListener('submit', e => {
+    if (paidHidden.value === "NO" && document.querySelector('input[name="plan"]:checked').value === "PAID") {
+      e.preventDefault();
+      alert("결제 후 체크해주세요.");
+    }
+  });
+
+  syncGuess();
+  syncPay();
+</script>
+
+</body>
+</html>
