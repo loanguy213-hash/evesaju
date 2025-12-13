@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>사주 상담 신청 — EVE 사주 분석</title>
+
 <style>
   body { font-family: sans-serif; background:#fafafa; padding:20px; }
   h1 { text-align:center; color:#065f46; }
@@ -22,10 +23,11 @@
   .secondary { background:#e5e7eb; }
   .row { display:flex; gap:12px; flex-wrap:wrap; }
   .half { flex:1; min-width:150px; }
-  .muted { font-size:13px;color:#6b7280;margin-top:6px; }
+  .muted { font-size:13px;color:#6b7280;margin-top:-10px;margin-bottom:10px; }
   .hidden { display:none; }
 </style>
 </head>
+
 <body>
 
 <h1>사주 상담 신청</h1>
@@ -37,9 +39,12 @@
   <!-- Formspree 옵션 -->
   <input type="hidden" name="_subject" value="EVE 사주 상담 신청 접수" />
 
-  <!-- 스팸봇 차단용 허니팟 -->
+  <!-- 스팸봇 차단 허니팟 -->
   <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" />
 
+  <!-- ========================= -->
+  <!-- 1. 기본 정보 -->
+  <!-- ========================= -->
   <div class="section">
     <h2>1. 기본 정보</h2>
 
@@ -47,21 +52,41 @@
     <input type="text" name="name" required>
 
     <label>이메일</label>
-    <input type="email" name="_replyto" required>
+    <input type="email" name="email" required>
 
     <div class="row">
       <div class="half">
-        <label>생년월일</label>
-        <input
-          type="date"
-          name="birth_date"
-          id="birth_date"
-          required
-          autocomplete="bday"
-        >
-        <div class="muted">예: 12/31/1990</div>
+        <label>성별</label>
+        <select name="gender" required>
+          <option value="">선택</option>
+          <option value="남">남</option>
+          <option value="여">여</option>
+          <option value="기타/비공개">기타 / 비공개</option>
+        </select>
       </div>
 
+      <div class="half">
+        <label>생년월일</label>
+
+        <!-- 사용자 입력 -->
+        <input
+          type="text"
+          id="birth_date_ui"
+          name="birth_date_ui"
+          placeholder="YYYY/MM/DD  예) 1987/03/14"
+          inputmode="numeric"
+          autocomplete="bday"
+          required
+        />
+
+        <!-- 서버 전송용 -->
+        <input type="hidden" id="birth_date" name="birth_date" />
+
+        <div class="muted">※ 숫자만 입력해도 / 가 자동으로 들어갑니다</div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="half">
         <label>출생시간</label>
         <select name="birth_time" id="birth_time">
@@ -83,39 +108,44 @@
     </div>
   </div>
 
+  <!-- ========================= -->
+  <!-- 2. 시주 추정 -->
+  <!-- ========================= -->
   <div class="section" id="guess-section">
     <h2>2. 시주 미상일 경우 — 시주 추정 테스트</h2>
 
     <label><b>1차 질문 — 전반적인 기질</b></label>
     <select id="test_q1" name="test_q1">
-      <option value="">※ 가장 가까운 하나를 선택하세요</option>
-      <option value="Q1-자형">① 분석·계산이 빠르고 밤형, 한 번 파면 끝까지 간다</option>
-      <option value="Q1-묘형">② 관계·조율 중심, 말이 부드럽고 중재 역할</option>
-      <option value="Q1-오형">③ 에너지·표현형, 리드·노출을 두려워하지 않음</option>
-      <option value="Q1-유형">④ 디테일·완성도·체면 중시</option>
+      <option value="">선택</option>
+      <option value="자">① 분석·계산 빠름 / 야행성 / 집요함</option>
+      <option value="묘">② 관계·조율 중심 / 말이 부드러움</option>
+      <option value="오">③ 밝고 드러남 / 리더·표현형</option>
+      <option value="유">④ 꼼꼼·완성도 / 체면 중시</option>
     </select>
 
-    <label><b>2차 질문 — 인간관계/대응</b></label>
+    <label><b>2차 질문 — 인간관계 스타일</b></label>
     <select id="test_q2" name="test_q2">
-      <option value="">※ 가장 가까운 문장 선택</option>
-      <option value="A">A. 이동·변화 선호</option>
-      <option value="B">B. 관계·조율 우선</option>
-      <option value="C">C. 직선·표현형</option>
-      <option value="D">D. 체면·완성도 중시</option>
+      <option value="">선택</option>
+      <option value="이동형">A. 이동·변화 선호</option>
+      <option value="조율형">B. 관계·중재 우선</option>
+      <option value="직선형">C. 직설·표현형</option>
+      <option value="완성형">D. 완성도·체면 중시</option>
     </select>
 
     <p class="muted">
-      ※ 시주 추정 참고 자료이며, 실제 해석은 전체 팔자 기준으로 진행됩니다.
+      ※ 시주 추정 참고용이며, 실제 해석은 전체 사주 구조 기준으로 판단합니다.
     </p>
   </div>
 
+  <!-- ========================= -->
+  <!-- 3. 메모 -->
+  <!-- ========================= -->
   <div class="section">
     <h2>3. 추가 메모</h2>
-    <textarea name="memo" rows="4"
-      placeholder="상담자에게 전하고 싶은 내용을 자유롭게 적어주세요."></textarea>
+    <textarea name="memo" rows="4" placeholder="상담자에게 전하고 싶은 내용을 자유롭게 적어주세요."></textarea>
   </div>
 
-  <div style="text-align:center; margin-top:20px;">
+  <div style="text-align:center;">
     <button class="primary" id="submitBtn" type="submit">분석 요청</button>
     <button class="secondary" type="reset">초기화</button>
   </div>
@@ -129,6 +159,7 @@
   const q2 = document.getElementById('test_q2');
   const submitBtn = document.getElementById('submitBtn');
 
+  // 시주 추정 토글
   function syncGuessUI() {
     if (!birthTimeEl.value) {
       guessSection.classList.remove('hidden');
@@ -142,28 +173,42 @@
       q2.value = "";
     }
   }
-
   syncGuessUI();
   birthTimeEl.addEventListener('change', syncGuessUI);
 
-  // 모바일에서 생년월일 → 텍스트 입력
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const birthDate = document.getElementById('birth_date');
+  // 생년월일 자동 슬래시 + ISO 변환
+  const birthUI = document.getElementById('birth_date_ui');
+  const birthHidden = document.getElementById('birth_date');
 
-  if (isMobile) {
-    birthDate.type = "text";
-    birthDate.placeholder = "MM/DD/YYYY";
-    birthDate.inputMode = "numeric";
-    birthDate.pattern = "^(0[1-9]|1[0-2])\\/(0[1-9]|[12][0-9]|3[01])\\/\\d{4}$";
-  }
+  birthUI.addEventListener('input', () => {
+    const digits = birthUI.value.replace(/\D/g,'').slice(0,8);
+    const y = digits.slice(0,4);
+    const m = digits.slice(4,6);
+    const d = digits.slice(6,8);
 
-  // 중복 제출 방지
-  form.addEventListener('submit', function () {
+    let out = y;
+    if (m) out += '/' + m;
+    if (d) out += '/' + d;
+    birthUI.value = out;
+
+    birthHidden.value = (y && m && d) ? `${y}-${m}-${d}` : '';
+  });
+
+  // 제출 제어
+  form.addEventListener('submit', (e) => {
+    if (!birthHidden.value) {
+      e.preventDefault();
+      birthUI.setCustomValidity('생년월일을 YYYY/MM/DD 형식으로 입력하세요.');
+      birthUI.reportValidity();
+      submitBtn.disabled = false;
+      submitBtn.textContent = "분석 요청";
+      return;
+    }
     submitBtn.disabled = true;
     submitBtn.textContent = "전송 중...";
   });
 
-  form.addEventListener('reset', function () {
+  form.addEventListener('reset', () => {
     setTimeout(() => {
       submitBtn.disabled = false;
       submitBtn.textContent = "분석 요청";
