@@ -248,7 +248,32 @@ const PAYMENT_LINK = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
 
   syncGuess();
   syncPay();
+</sc<!-- Payment success banner -->
+<div id="paySuccess" style="
+  display:none;
+  background:#ecfdf5; border:1px solid #10b981; color:#065f46;
+  padding:14px 16px; border-radius:12px; margin:12px 0;
+  font-weight:700;
+">
+  ✅ 결제가 성공적으로 완료되었습니다. 아래 상담 정보를 입력해주시면 분석이 시작됩니다.
+</div>
+
+<script>
+  // 결제 후 Stripe가 붙여주는 쿼리스트링(대표적으로 ?payment_intent=..., ?redirect_status=succeeded 등)을 감지
+  const qs = new URLSearchParams(location.search);
+  const succeeded =
+    qs.get("redirect_status") === "succeeded" ||
+    qs.get("payment_intent") ||
+    qs.get("session_id") ||
+    qs.get("payment_intent_client_secret");
+
+  if (succeeded) {
+    document.getElementById("paySuccess").style.display = "block";
+    // 주소창 지저분하면 성공 표시 후 쿼리 제거(새로고침해도 배너 유지되진 않음)
+    // history.replaceState({}, document.title, location.pathname);
+  }
 </script>
+ript>
 
 </body>
 </html>
