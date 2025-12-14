@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -119,22 +120,22 @@
     <h2>2. 시주 미상 — 성향 기반 추정</h2>
 
     <label><b>1차 질문</b></label>
-    <select id="test_q1" name="test_q1">
-      <option value="">선택</option>
-      <option value="자">분석·집요</option>
-      <option value="묘">관계·조율</option>
-      <option value="오">표현·리더</option>
-      <option value="유">완성·체면</option>
-    </select>
+<select id="test_q1" name="test_q1">
+  <option value="">선택</option>
+  <option value="A">감정이 없어 보인다는 오해를 받지만 속으로는 다 계산 중</option>
+  <option value="B">우유부단해 보이지만 모두를 고려하고 있다</option>
+  <option value="C">나서고 튄다는 오해를 받지만 분위기를 살리려는 것</option>
+  <option value="D">까다롭다는 오해를 받지만 완성도를 중시한다</option>
+</select>
 
     <label><b>2차 질문</b></label>
-    <select id="test_q2" name="test_q2">
-      <option value="">선택</option>
-      <option value="A">이동·유연</option>
-      <option value="B">중재·관계</option>
-      <option value="C">직선·표현</option>
-      <option value="D">정밀·완성</option>
-    </select>
+   <select id="test_q2" name="test_q2">
+  <option value="">선택</option>
+  <option value="A">압박일수록 원인·구조·근거부터 정리한다</option>
+  <option value="B">압박일수록 사람과 관계부터 정리한다</option>
+  <option value="C">압박일수록 앞으로 나가 말로 정리하고 속도를 낸다</option>
+  <option value="D">압박일수록 디테일과 완성도를 점검한다</option>
+</select>
 
     <p class="muted">※ 참고 자료로만 사용됩니다.</p>
   </div>
@@ -179,21 +180,11 @@
     <textarea name="memo" rows="4"></textarea>
   </div>
 
-     <div style="text-align:center;">
+  <div style="text-align:center;">
     <button class="primary" id="submitBtn" type="submit">분석 요청</button>
     <button class="secondary" type="reset">초기화</button>
   </div>
 </form>
-
-<!-- Payment success banner -->
-<div id="paySuccess" style="
-  display:none;
-  background:#ecfdf5; border:1px solid #10b981; color:#065f46;
-  padding:14px 16px; border-radius:12px; margin:12px 0;
-  font-weight:700;
-">
-  ✅ 결제가 성공적으로 완료되었습니다. 아래 상담 정보를 입력해주시면 분석이 시작됩니다.
-</div>
 
 <script>
   const form = document.getElementById('consult-form');
@@ -207,12 +198,29 @@
   const paidHidden = document.getElementById('paid_confirm');
   const btnPay = document.getElementById('btnPay');
 
-  // Stripe Payment Link (LIVE MODE)
-  const PAYMENT_LINK = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
-
+  // ✅ Stripe Payment Link (TEST MODE)
+const PAYMENT_LINK = "https://buy.stripe.com/test_bJe7sN0wR8a26im7UlcjS06";
   function syncGuess() {
-    guess.classList.toggle('hidden', !!birthTime.value);
+  const unknownTime = !birthTime.value; // 출생시간 모름이면 true
+
+  // 시간 모르면 시주 추정 섹션 보이기
+  guess.classList.toggle('hidden', !unknownTime);
+
+  const q1 = document.getElementById('test_q1');
+  const q2 = document.getElementById('test_q2');
+
+  if (unknownTime) {
+    // 반드시 답하도록 강제
+    q1.required = true;
+    q2.required = true;
+  } else {
+    // 시간 알면 질문 숨기고 초기화
+    q1.required = false;
+    q2.required = false;
+    q1.value = "";
+    q2.value = "";
   }
+}
 
   function syncPay() {
     const paid = document.querySelector('input[name="plan"]:checked').value === "PAID";
@@ -237,15 +245,28 @@
     window.open(PAYMENT_LINK, "_blank");
   });
 
-  form.addEventListener('submit', e => {
-    if (
-      document.querySelector('input[name="plan"]:checked').value === "PAID" &&
-      paidHidden.value === "NO"
-    ) {
+ form.addEventListener('submit', e => {
+
+  // ✅ [추가] 출생시간 모름이면 Q1/Q2 필수
+  if (!birthTime.value) {
+    const q1 = document.getElementById('test_q1').value;
+    const q2 = document.getElementById('test_q2').value;
+    if (!q1 || !q2) {
       e.preventDefault();
-      alert("결제 후 '결제를 완료했습니다'에 체크해주세요.");
+      alert("출생시간을 모르시면 1차·2차 질문에 반드시 답변해주세요.");
+      return;
     }
-  });
+  }
+
+  // 기존 유료 결제 방어
+  if (
+    document.querySelector('input[name="plan"]:checked').value === "PAID" &&
+    paidHidden.value === "NO"
+  ) {
+    e.preventDefault();
+    alert("결제 후 '결제를 완료했습니다'에 체크해주세요.");
+  }
+});
 
   form.addEventListener('reset', () => {
     setTimeout(() => {
@@ -254,19 +275,6 @@
       syncPay();
     }, 0);
   });
-
-  // 결제 성공 감지 → 배너 표시
-  const qs = new URLSearchParams(window.location.search);
-  const succeeded =
-    qs.get("redirect_status") === "succeeded" ||
-    qs.has("payment_intent") ||
-    qs.has("session_id") ||
-    qs.has("payment_intent_client_secret");
-
-  if (succeeded) {
-    const el = document.getElementById("paySuccess");
-    if (el) el.style.display = "block";
-  }
 
   syncGuess();
   syncPay();
