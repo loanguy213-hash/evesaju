@@ -179,11 +179,21 @@
     <textarea name="memo" rows="4"></textarea>
   </div>
 
-  <div style="text-align:center;">
+     <div style="text-align:center;">
     <button class="primary" id="submitBtn" type="submit">분석 요청</button>
     <button class="secondary" type="reset">초기화</button>
   </div>
 </form>
+
+<!-- Payment success banner -->
+<div id="paySuccess" style="
+  display:none;
+  background:#ecfdf5; border:1px solid #10b981; color:#065f46;
+  padding:14px 16px; border-radius:12px; margin:12px 0;
+  font-weight:700;
+">
+  ✅ 결제가 성공적으로 완료되었습니다. 아래 상담 정보를 입력해주시면 분석이 시작됩니다.
+</div>
 
 <script>
   const form = document.getElementById('consult-form');
@@ -197,9 +207,8 @@
   const paidHidden = document.getElementById('paid_confirm');
   const btnPay = document.getElementById('btnPay');
 
-  // ✅ Stripe Payment Link (LIVE MODE)
-const PAYMENT_LINK = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
-
+  // Stripe Payment Link (LIVE MODE)
+  const PAYMENT_LINK = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
 
   function syncGuess() {
     guess.classList.toggle('hidden', !!birthTime.value);
@@ -246,21 +255,8 @@ const PAYMENT_LINK = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
     }, 0);
   });
 
-  syncGuess();
-  syncPay();
-<!-- Payment success banner -->
-<div id="paySuccess" style="
-  display:none;
-  background:#ecfdf5; border:1px solid #10b981; color:#065f46;
-  padding:14px 16px; border-radius:12px; margin:12px 0;
-  font-weight:700;
-">
-  ✅ 결제가 성공적으로 완료되었습니다. 아래 상담 정보를 입력해주시면 분석이 시작됩니다.
-</div>
-
-<script>
+  // 결제 성공 감지 → 배너 표시
   const qs = new URLSearchParams(window.location.search);
-
   const succeeded =
     qs.get("redirect_status") === "succeeded" ||
     qs.has("payment_intent") ||
@@ -271,9 +267,10 @@ const PAYMENT_LINK = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
     const el = document.getElementById("paySuccess");
     if (el) el.style.display = "block";
   }
-</script>
 
-ript>
+  syncGuess();
+  syncPay();
+</script>
 
 </body>
 </html>
