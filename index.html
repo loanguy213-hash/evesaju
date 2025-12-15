@@ -530,7 +530,7 @@ guess_notice_text: "These 10 questions help estimate your birth time. Please ans
     return true;
   }
 
-  btnPay.addEventListener('click', () => {
+ btnPay.addEventListener('click', () => {
   const isEN = (LANG === "en");
   const baseLink = isEN ? PAYMENT_LINK_EN : PAYMENT_LINK_KR;
 
@@ -543,8 +543,15 @@ guess_notice_text: "These 10 questions help estimate your birth time. Please ans
   const sep = baseLink.includes("?") ? "&" : "?";
   const payUrl = `${baseLink}${sep}locale=${encodeURIComponent(locale)}`;
 
-  window.open(payUrl, "_blank", "noopener,noreferrer");
+  // 1) 새 탭 시도
+  const w = window.open(payUrl, "_blank", "noopener,noreferrer");
+
+  // 2) 팝업 차단 시 같은 탭으로 이동 (모바일/사파리 대응)
+  if (!w) {
+    window.location.href = payUrl;
+  }
 });
+
 
 
   chkPaid.addEventListener('change', setSubmitEnabled);
