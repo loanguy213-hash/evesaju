@@ -90,7 +90,15 @@
     <div class="row">
       <div class="col">
         <label for="birth_date" data-i18n="label_birth_date">생년월일</label>
-        <input id="birth_date" name="birth_date" type="date" required />
+<input
+  id="birth_date"
+  name="birth_date"
+  type="text"
+  placeholder="YYYY-MM-DD"
+  inputmode="numeric"
+  pattern="\d{4}-\d{2}-\d{2}"
+  required
+/>
       </div>
       <div class="col">
         <label for="birth_time" data-i18n="label_birth_time">출생 시간</label>
