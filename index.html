@@ -47,6 +47,14 @@
   .langbar{display:flex; justify-content:center; gap:8px; margin:10px 0 18px;}
   .langbtn{padding:8px 12px; border-radius:999px; border:1px solid #d1d5db; background:#fff; cursor:pointer; font-weight:800;}
   .langbtn.active{border-color:#10b981; color:#065f46; background:#ecfdf5;}
+  .point-of-no-return{
+  text-align:center;
+  color:#6b7280;
+  font-size:13px;
+  font-style:italic;
+  margin:4px 0 18px 0;
+}
+
 </style>
 </head>
 
@@ -54,6 +62,9 @@
 
 <h1 data-i18n="title">사주 상담 신청 — EVE 사주 분석</h1>
 <p class="subtitle" data-i18n="subtitle">— (당신에게 주어진 길) —</p>
+<p class="point-of-no-return" data-i18n="point_of_no_return">
+  되돌릴 수 없는 분석이 시작됩니다.
+</p>
 
 <div class="langbar">
   <button type="button" class="langbtn active" id="btnKR" aria-pressed="true">한국어</button>
@@ -295,6 +306,16 @@ const PAYMENT_LINK_EN = "https://buy.stripe.com/bJe7sN0wR8a26im7UlcjS06";
     kr: {
       title: "사주 상담 신청 — EVE 사주 분석",
       subtitle: "— (당신에게 주어진 길) —",
+      kr: {
+  title: "사주 상담 신청 — EVE 사주 분석",
+  subtitle: "— (당신에게 주어진 길) —",
+
+  point_of_no_return: "되돌릴 수 없는 분석이 시작됩니다.",
+
+  pill_lang: "Korean/English",
+  pill_hint: "같은 형식 • 텍스트만 전환",
+  ...
+
       pill_lang: "Korean/English",
       pill_hint: "같은 형식 • 텍스트만 전환",
 
@@ -367,6 +388,16 @@ guess_notice_text: "아래 10문항은 시주 추정에 사용됩니다. 모두 
     en: {
       title: "Saju Consultation Request — EVE Saju Analysis",
       subtitle: "— (The Path Given to You) —",
+      en: {
+  title: "Saju Consultation Request — EVE Saju Analysis",
+  subtitle: "— (The Path Given to You) —",
+
+  point_of_no_return: "An irreversible analysis begins.",
+
+  pill_lang: "Korean/English",
+  pill_hint: "Same layout • Text switches only",
+  ...
+
       pill_lang: "Korean/English",
       pill_hint: "Same layout • Text switches only",
 
