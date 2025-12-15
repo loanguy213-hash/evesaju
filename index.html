@@ -287,8 +287,11 @@
   </div>
 
 </form>
-
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ====== quick sanity check (페이지에서 JS 살아있는지 1초 만에 확인) ======
+  console.log("[EVE] JS loaded ✅");
+
   // ✅ LIVE Stripe Payment Links
   const PAYMENT_LINK_KR = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
   const PAYMENT_LINK_EN = "https://buy.stripe.com/bJe7sN0wR8a26im7UlcjS06";
@@ -301,6 +304,16 @@
   const chkPaid = document.getElementById('chkPaidConfirm');
   const paidHidden = document.getElementById('paid_confirm');
   const btnPay = document.getElementById('btnPay');
+
+  const btnKR = document.getElementById("btnKR");
+  const btnEN = document.getElementById("btnEN");
+
+  // --- 요소가 하나라도 없으면(HTML 일부가 잘못 붙었을 때) 여기서 바로 멈춰서 알려줌 ---
+  if (!form || !birthTime || !guess || !submitBtn || !chkPaid || !paidHidden || !btnPay || !btnKR || !btnEN) {
+    console.error("[EVE] Missing element(s). Check IDs in HTML.");
+    alert("페이지 구성요소(ID)가 일부 누락되었습니다. HTML이 온전히 저장/배포되었는지 확인하세요.");
+    return;
+  }
 
   // ---------- i18n ----------
   const I18N = {
@@ -320,7 +333,7 @@
       label_birth_time: "출생 시간",
       opt_select: "선택…",
       opt_unknown: "시간 모름",
-      hint_time_unknown: "시간 모름을 선택하면 아래 시주 추정 문항 10개에 반드시 답해야 제출됩니다.",
+      hint_time_unknown: "시간 모름을 선택하면 아래 추정 문항 10개에 반드시 답해야 제출됩니다.",
 
       label_birth_place: "출생지(도시/국가)",
       ph_birth_place: "예: Seoul, South Korea",
@@ -331,28 +344,7 @@
       opt_other: "기타/응답 안함",
 
       guess_notice_bold: "시간 모름:",
-      guess_notice_text: "아래 10문항은 시주 추정에 사용됩니다. 모두 답해주세요.",
-
-      q1:"1) 내 인생의 기본 모드(디폴트)는…",
-      q1_a:"깊은 집중/전략/고독, 밤에 강함", q1_b:"부드럽지만 꾸준한 성장, 루틴/정돈", q1_c:"대담한 가시성/리더십, 속전속결", q1_d:"날카로운 판단/기준, ‘정확·깔끔’",
-      q2:"2) 생산성이 가장 잘 나오는 시간대는…",
-      q2_a:"심야/모두 잠든 뒤", q2_b:"이른 아침/조용한 시작", q2_c:"한낮/현장이 뜨거울 때", q2_d:"저녁/정리·마감 시간",
-      q3:"3) 스트레스를 받으면 나는…",
-      q3_a:"숨고 분석한다(비공개)", q3_b:"민감해지고 평화를 찾는다(충돌 회피)", q3_c:"바로 부딪히고 ‘지금 해결’", q3_d:"비판/수정/규칙을 더 엄격히",
-      q4:"4) 인간관계에서 나는…",
-      q4_a:"적지만 깊게, 충성/의리", q4_b:"따뜻하게 보살피고 말에 조심", q4_c:"열정/직진, 에너지와 속도", q4_d:"기준이 높고 ‘예의/존중’ 중요",
-      q5:"5) 돈에 대한 내 스타일은…",
-      q5_a:"정보/타이밍 기반 장기전", q5_b:"저축/안정, 점진적 성장", q5_c:"크게 베팅, 기회 오면 빠르게", q5_d:"예산·정산 철저, 낭비 싫음",
-      q6:"6) 내 집/책상 상태는 보통…",
-      q6_a:"프라이빗, 내 셋업 건드리면 싫음", q6_b:"아늑·편안, 분위기 중시", q6_c:"바쁘고 역동적, 도구가 늘 준비됨", q6_d:"정리/라벨/미감, ‘정돈’이 기본",
-      q7:"7) 새로 배울 때 나는…",
-      q7_a:"혼자 깊게 파고 이론부터 마스터", q7_b:"단계적으로 반복하며 익힘", q7_c:"손으로 부딪히며 빠른 피드백", q7_d:"표준/베스트프랙티스, ‘정석’ 선호",
-      q8:"8) 사람들이 나를 흔히 이렇게 말한다…",
-      q8_a:"신비/사색/속을 잘 안 보임", q8_b:"친절/섬세/감정이 세밀함", q8_c:"자신감/에너지/강한 추진", q8_d:"까다로움/정확/기준이 높음",
-      q9:"9) 내 ‘승리 조건’은 보통…",
-      q9_a:"정보·타이밍을 쥐는 것", q9_b:"조화 유지 + 꾸준한 성장", q9_c:"열기·주목·결단의 실행", q9_d:"정교화·최적화·완성도",
-      q10:"10) 하나만 고르라면 나는…",
-      q10_a:"겨울/자정/물의 기운", q10_b:"봄/새벽/나무의 기운", q10_c:"여름/정오/불의 기운", q10_d:"가을/해질녘/금속의 기운",
+      guess_notice_text: "아래 10문항은 출생 시간 추정에 사용됩니다. 모두 답해주세요.",
 
       label_topic: "어떤 주제를 중심으로 볼까요?",
       opt_overall: "종합",
@@ -373,7 +365,7 @@
       btn_submit: "분석 요청",
       btn_reset: "초기화",
 
-      alert_need_guess: "출생 시간이 ‘시간 모름’입니다. 시주 추정 문항 10개를 모두 답한 후 제출해 주세요.",
+      alert_need_guess: "출생 시간이 ‘시간 모름’입니다. 추정 문항 10개를 모두 답한 후 제출해 주세요.",
       alert_need_pay: "결제를 완료한 뒤 확인 체크를 해주세요.",
       alert_need_link: "Stripe 결제 링크(KR/EN) 두 개를 PAYMENT_LINK_KR / PAYMENT_LINK_EN에 붙여넣어 주세요."
     },
@@ -394,7 +386,7 @@
       label_birth_time: "Birth Time",
       opt_select: "Select…",
       opt_unknown: "Unknown",
-      hint_time_unknown: "If you choose Unknown, you must answer all 10 Birth Time Estimation questions below.",
+      hint_time_unknown: "If you choose Unknown, you must answer all 10 questions below.",
 
       label_birth_place: "Birth Place (City / Country)",
       ph_birth_place: "e.g., Seoul, South Korea",
@@ -406,27 +398,6 @@
 
       guess_notice_bold: "Birth time unknown:",
       guess_notice_text: "These 10 questions help estimate your birth time. Please answer all.",
-
-      q1:"1) Your strongest “default mode” in life is…",
-      q1_a:"Deep focus, strategy, solitude; strong at night", q1_b:"Gentle but persistent growth; steady routines", q1_c:"Bold visibility/leadership; fast decisions", q1_d:"Sharp standards; precise and clean",
-      q2:"2) Your most common productivity window is…",
-      q2_a:"Late night / after everyone sleeps", q2_b:"Early morning / calm start", q2_c:"Midday / when things are moving", q2_d:"Evening / when you finalize and tidy up",
-      q3:"3) Under stress, you tend to…",
-      q3_a:"Withdraw and analyze privately", q3_b:"Get sensitive; seek peace; avoid harsh conflict", q3_c:"Confront fast; “solve it now”", q3_d:"Critique, correct, tighten rules",
-      q4:"4) In relationships, your pattern is closer to…",
-      q4_a:"Few but deep; loyalty over quantity", q4_b:"Warm and supportive; careful with words", q4_c:"Passionate and direct; needs momentum", q4_d:"High standards; respect-based; dislikes sloppy behavior",
-      q5:"5) Your money style is…",
-      q5_a:"Strategic investing; long game; timing advantage", q5_b:"Steady savings; gradual growth; low risk", q5_c:"Big swings; bold bets; fast opportunities", q5_d:"Strict budgeting; hates waste",
-      q6:"6) Your home/desk is usually…",
-      q6_a:"Private; don’t touch my setup", q6_b:"Cozy and calm vibe", q6_c:"Busy, active; tools ready to move", q6_d:"Organized; labeled; aesthetically precise",
-      q7:"7) When learning something new, you prefer…",
-      q7_a:"Deep dive alone; master theory first", q7_b:"Step-by-step with repetition", q7_c:"Hands-on; trial and error; fast feedback", q7_d:"Best practices and standards; do it “right”",
-      q8:"8) People often describe you as…",
-      q8_a:"Mysterious / thoughtful / hard to read", q8_b:"Kind / elegant / emotionally tuned-in", q8_c:"Confident / energetic / intense", q8_d:"Sharp / picky / very accurate",
-      q9:"9) Your “winning condition” is usually…",
-      q9_a:"Control information and timing", q9_b:"Maintain harmony and grow steadily", q9_c:"Create heat, attention, decisive action", q9_d:"Refine, optimize, and perfect systems",
-      q10:"10) If you had to pick one, you relate more to…",
-      q10_a:"Winter / midnight / water vibe", q10_b:"Spring / dawn / wood vibe", q10_c:"Summer / noon / fire vibe", q10_d:"Autumn / sunset / metal vibe",
 
       label_topic: "What would you like to focus on?",
       opt_overall: "Overall reading",
@@ -447,13 +418,17 @@
       btn_submit: "Request Analysis",
       btn_reset: "Reset",
 
-      alert_need_guess: "Birth time is set to Unknown. Please answer all 10 Birth Time Estimation questions before submitting.",
+      alert_need_guess: "Birth time is set to Unknown. Please answer all 10 questions before submitting.",
       alert_need_pay: "Please complete payment and check the confirmation box to submit.",
       alert_need_link: "Please paste both Stripe Payment Links into PAYMENT_LINK_KR and PAYMENT_LINK_EN."
     }
   };
 
   let LANG = "kr";
+
+  function t(key) {
+    return (I18N[LANG] && I18N[LANG][key]) ? I18N[LANG][key] : key;
+  }
 
   function applyI18n(lang){
     LANG = lang;
@@ -472,12 +447,6 @@
     document.documentElement.lang = (lang === "kr") ? "ko" : "en";
   }
 
-  window.t = (key) => (I18N[LANG] && I18N[LANG][key]) ? I18N[LANG][key] : key;
-
-  // toggle buttons
-  const btnKR = document.getElementById("btnKR");
-  const btnEN = document.getElementById("btnEN");
-
   function setActive(btnOn, btnOff){
     btnOn.classList.add("active");
     btnOff.classList.remove("active");
@@ -494,13 +463,13 @@
     submitBtn.disabled = !paidOk;
     paidHidden.value = paidOk ? "yes" : "no";
   }
+  chkPaid.addEventListener('change', setSubmitEnabled);
 
   // ---------- Unknown time => require all 10 answers ----------
   function setGuessRequired(isRequired) {
     const wraps = guess.querySelectorAll('.radio-wrap[data-required="1"]');
     wraps.forEach(wrap => {
-      const radios = wrap.querySelectorAll('input[type="radio"]');
-      radios.forEach(r => r.required = isRequired);
+      wrap.querySelectorAll('input[type="radio"]').forEach(r => r.required = isRequired);
     });
   }
 
@@ -510,13 +479,11 @@
     setGuessRequired(unknown);
   }
 
+  birthTime.addEventListener('change', handleBirthTimeUI);
+
   function allGuessAnswered() {
     const groups = ["g_q1","g_q2","g_q3","g_q4","g_q5","g_q6","g_q7","g_q8","g_q9","g_q10"];
-    for (const g of groups) {
-      const picked = form.querySelector(`input[name="${g}"]:checked`);
-      if (!picked) return false;
-    }
-    return true;
+    return groups.every(g => !!form.querySelector(`input[name="${g}"]:checked`));
   }
 
   // ---------- Pay button (popup fallback) ----------
@@ -524,8 +491,8 @@
     const isEN = (LANG === "en");
     const baseLink = isEN ? PAYMENT_LINK_EN : PAYMENT_LINK_KR;
 
-    if (!baseLink || baseLink.includes("PASTE_")) {
-      alert(window.t("alert_need_link"));
+    if (!baseLink) {
+      alert(t("alert_need_link"));
       return;
     }
 
@@ -537,30 +504,29 @@
     if (!w) window.location.href = payUrl;
   });
 
-  chkPaid.addEventListener('change', setSubmitEnabled);
-  birthTime.addEventListener('change', handleBirthTimeUI);
-
-  form.addEventListener('reset', () => {
-    setTimeout(() => {
-      chkPaid.checked = false;
-      setSubmitEnabled();
-      handleBirthTimeUI();
-    }, 0);
-  });
-
+  // ---------- Submit guard ----------
   form.addEventListener('submit', (e) => {
     if (birthTime.value === "unknown" && !allGuessAnswered()) {
       e.preventDefault();
-      alert(window.t("alert_need_guess"));
+      alert(t("alert_need_guess"));
       guess.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
     if (!chkPaid.checked) {
       e.preventDefault();
-      alert(window.t("alert_need_pay"));
+      alert(t("alert_need_pay"));
       return;
     }
+  });
+
+  // ---------- Reset ----------
+  form.addEventListener('reset', () => {
+    setTimeout(() => {
+      chkPaid.checked = false;
+      setSubmitEnabled();
+      handleBirthTimeUI();
+    }, 0);
   });
 
   // ===== Birth date auto-format (YYYY-MM-DD) =====
@@ -580,14 +546,14 @@
   if (birthDateInput) {
     birthDateInput.addEventListener("input", (e) => {
       const before = e.target.value;
-      const start = e.target.selectionStart || before.length;
-
       e.target.value = formatYYYYMMDD(e.target.value);
 
-      const after = e.target.value;
-      const diff = after.length - before.length;
-      const pos = Math.max(0, start + diff);
-      e.target.setSelectionRange(pos, pos);
+      // 모바일에서 커서 튐 방지(try-catch)
+      try {
+        const diff = e.target.value.length - before.length;
+        const pos = Math.max(0, (e.target.selectionStart || e.target.value.length) + diff);
+        e.target.setSelectionRange(pos, pos);
+      } catch (_) {}
     });
   }
 
@@ -595,7 +561,10 @@
   applyI18n(LANG);
   setSubmitEnabled();
   handleBirthTimeUI();
+});
 </script>
+
+
 
 </body>
 </html>
