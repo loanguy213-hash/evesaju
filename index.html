@@ -9,6 +9,15 @@
   body { font-family: sans-serif; background:#fafafa; padding:20px; }
   h1 { text-align:center; color:#065f46; margin-bottom:6px; }
   .subtitle { text-align:center; color:#6b7280; margin-top:0; margin-bottom:14px; font-size:14px; }
+
+  .point-of-no-return{
+    text-align:center;
+    color:#6b7280;
+    font-size:13px;
+    font-style:italic;
+    margin:4px 0 18px 0;
+  }
+
   .section { background:#fff; padding:20px; border-radius:14px; border:1px solid #e5e7eb; margin-bottom:20px; }
   label { font-weight:600; display:block; margin-bottom:6px; }
   input, select, textarea {
@@ -47,14 +56,6 @@
   .langbar{display:flex; justify-content:center; gap:8px; margin:10px 0 18px;}
   .langbtn{padding:8px 12px; border-radius:999px; border:1px solid #d1d5db; background:#fff; cursor:pointer; font-weight:800;}
   .langbtn.active{border-color:#10b981; color:#065f46; background:#ecfdf5;}
-  .point-of-no-return{
-  text-align:center;
-  color:#6b7280;
-  font-size:13px;
-  font-style:italic;
-  margin:4px 0 18px 0;
-}
-
 </style>
 </head>
 
@@ -62,6 +63,7 @@
 
 <h1 data-i18n="title">사주 상담 신청 — EVE 사주 분석</h1>
 <p class="subtitle" data-i18n="subtitle">— (당신에게 주어진 길) —</p>
+
 <p class="point-of-no-return" data-i18n="point_of_no_return">
   되돌릴 수 없는 분석이 시작됩니다.
 </p>
@@ -76,7 +78,6 @@
   action="https://formspree.io/f/xjkndyrq"
   method="POST"
   accept-charset="UTF-8">
-
 
   <div class="section">
     <div class="inline" style="justify-content:space-between;">
@@ -101,19 +102,19 @@
     <div class="row">
       <div class="col">
         <label for="birth_date" data-i18n="label_birth_date">생년월일</label>
-<input
-  id="birth_date"
-  name="birth_date"
-  type="text"
-  placeholder="YYYY-MM-DD"
-  inputmode="numeric"
-  autocomplete="bday"
-  maxlength="10"
-  pattern="\d{4}-\d{2}-\d{2}"
-  required
-/>
-
+        <input
+          id="birth_date"
+          name="birth_date"
+          type="text"
+          placeholder="YYYY-MM-DD"
+          inputmode="numeric"
+          autocomplete="bday"
+          maxlength="10"
+          pattern="\d{4}-\d{2}-\d{2}"
+          required
+        />
       </div>
+
       <div class="col">
         <label for="birth_time" data-i18n="label_birth_time">출생 시간</label>
         <select id="birth_time" name="birth_time" required>
@@ -150,8 +151,8 @@
   <div class="section hidden" id="guess-section">
     <div class="notice" style="margin-bottom:14px;">
       <b data-i18n="guess_notice_bold">시간 모름:</b>
- <span data-i18n="guess_notice_text">아래 10문항은 시주 추정에 사용됩니다. 모두 답해주세요.</span>
-   </div>
+      <span data-i18n="guess_notice_text">아래 10문항은 시주 추정에 사용됩니다. 모두 답해주세요.</span>
+    </div>
 
     <!-- Q1 -->
     <div class="radio-wrap" data-required="1">
@@ -288,9 +289,9 @@
 </form>
 
 <script>
-  // ✅ Replace with your LIVE Stripe Payment Link
-const PAYMENT_LINK_KR = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
-const PAYMENT_LINK_EN = "https://buy.stripe.com/bJe7sN0wR8a26im7UlcjS06";
+  // ✅ LIVE Stripe Payment Links
+  const PAYMENT_LINK_KR = "https://buy.stripe.com/5kQ4gBcfz0HA8qu6QhcjS05";
+  const PAYMENT_LINK_EN = "https://buy.stripe.com/bJe7sN0wR8a26im7UlcjS06";
 
   const form = document.getElementById('consult-form');
   const birthTime = document.getElementById('birth_time');
@@ -306,15 +307,7 @@ const PAYMENT_LINK_EN = "https://buy.stripe.com/bJe7sN0wR8a26im7UlcjS06";
     kr: {
       title: "사주 상담 신청 — EVE 사주 분석",
       subtitle: "— (당신에게 주어진 길) —",
-      kr: {
-  title: "사주 상담 신청 — EVE 사주 분석",
-  subtitle: "— (당신에게 주어진 길) —",
-
-  point_of_no_return: "되돌릴 수 없는 분석이 시작됩니다.",
-
-  pill_lang: "Korean/English",
-  pill_hint: "같은 형식 • 텍스트만 전환",
-  ...
+      point_of_no_return: "되돌릴 수 없는 분석이 시작됩니다.",
 
       pill_lang: "Korean/English",
       pill_hint: "같은 형식 • 텍스트만 전환",
@@ -338,7 +331,7 @@ const PAYMENT_LINK_EN = "https://buy.stripe.com/bJe7sN0wR8a26im7UlcjS06";
       opt_other: "기타/응답 안함",
 
       guess_notice_bold: "시간 모름:",
-guess_notice_text: "아래 10문항은 시주 추정에 사용됩니다. 모두 답해주세요.",
+      guess_notice_text: "아래 10문항은 시주 추정에 사용됩니다. 모두 답해주세요.",
 
       q1:"1) 내 인생의 기본 모드(디폴트)는…",
       q1_a:"깊은 집중/전략/고독, 밤에 강함", q1_b:"부드럽지만 꾸준한 성장, 루틴/정돈", q1_c:"대담한 가시성/리더십, 속전속결", q1_d:"날카로운 판단/기준, ‘정확·깔끔’",
@@ -382,21 +375,13 @@ guess_notice_text: "아래 10문항은 시주 추정에 사용됩니다. 모두 
 
       alert_need_guess: "출생 시간이 ‘시간 모름’입니다. 시주 추정 문항 10개를 모두 답한 후 제출해 주세요.",
       alert_need_pay: "결제를 완료한 뒤 확인 체크를 해주세요.",
-      alert_need_link: "PAYMENT_LINK에 Stripe 결제 링크를 먼저 붙여넣어 주세요."
+      alert_need_link: "Stripe 결제 링크(KR/EN) 두 개를 PAYMENT_LINK_KR / PAYMENT_LINK_EN에 붙여넣어 주세요."
     },
 
     en: {
       title: "Saju Consultation Request — EVE Saju Analysis",
       subtitle: "— (The Path Given to You) —",
-      en: {
-  title: "Saju Consultation Request — EVE Saju Analysis",
-  subtitle: "— (The Path Given to You) —",
-
-  point_of_no_return: "An irreversible analysis begins.",
-
-  pill_lang: "Korean/English",
-  pill_hint: "Same layout • Text switches only",
-  ...
+      point_of_no_return: "An irreversible analysis begins.",
 
       pill_lang: "Korean/English",
       pill_hint: "Same layout • Text switches only",
@@ -420,7 +405,7 @@ guess_notice_text: "아래 10문항은 시주 추정에 사용됩니다. 모두 
       opt_other: "Other / Prefer not to say",
 
       guess_notice_bold: "Birth time unknown:",
-guess_notice_text: "These 10 questions help estimate your birth time. Please answer all.",
+      guess_notice_text: "These 10 questions help estimate your birth time. Please answer all.",
 
       q1:"1) Your strongest “default mode” in life is…",
       q1_a:"Deep focus, strategy, solitude; strong at night", q1_b:"Gentle but persistent growth; steady routines", q1_c:"Bold visibility/leadership; fast decisions", q1_d:"Sharp standards; precise and clean",
@@ -464,11 +449,12 @@ guess_notice_text: "These 10 questions help estimate your birth time. Please ans
 
       alert_need_guess: "Birth time is set to Unknown. Please answer all 10 Birth Time Estimation questions before submitting.",
       alert_need_pay: "Please complete payment and check the confirmation box to submit.",
-      alert_need_link: "Please paste your Stripe Payment Link into PAYMENT_LINK first."
+      alert_need_link: "Please paste both Stripe Payment Links into PAYMENT_LINK_KR and PAYMENT_LINK_EN."
     }
   };
 
   let LANG = "kr";
+
   function applyI18n(lang){
     LANG = lang;
     const dict = I18N[lang];
@@ -485,17 +471,20 @@ guess_notice_text: "These 10 questions help estimate your birth time. Please ans
 
     document.documentElement.lang = (lang === "kr") ? "ko" : "en";
   }
+
   window.t = (key) => (I18N[LANG] && I18N[LANG][key]) ? I18N[LANG][key] : key;
 
   // toggle buttons
   const btnKR = document.getElementById("btnKR");
   const btnEN = document.getElementById("btnEN");
+
   function setActive(btnOn, btnOff){
     btnOn.classList.add("active");
     btnOff.classList.remove("active");
     btnOn.setAttribute("aria-pressed","true");
     btnOff.setAttribute("aria-pressed","false");
   }
+
   btnKR.addEventListener("click", () => { applyI18n("kr"); setActive(btnKR, btnEN); });
   btnEN.addEventListener("click", () => { applyI18n("en"); setActive(btnEN, btnKR); });
 
@@ -530,29 +519,23 @@ guess_notice_text: "These 10 questions help estimate your birth time. Please ans
     return true;
   }
 
- btnPay.addEventListener('click', () => {
-  const isEN = (LANG === "en");
-  const baseLink = isEN ? PAYMENT_LINK_EN : PAYMENT_LINK_KR;
+  // ---------- Pay button (popup fallback) ----------
+  btnPay.addEventListener('click', () => {
+    const isEN = (LANG === "en");
+    const baseLink = isEN ? PAYMENT_LINK_EN : PAYMENT_LINK_KR;
 
-  if (!baseLink || baseLink.includes("PASTE_")) {
-    alert(window.t("alert_need_link"));
-    return;
-  }
+    if (!baseLink || baseLink.includes("PASTE_")) {
+      alert(window.t("alert_need_link"));
+      return;
+    }
 
-  const locale = isEN ? "en" : "ko";
-  const sep = baseLink.includes("?") ? "&" : "?";
-  const payUrl = `${baseLink}${sep}locale=${encodeURIComponent(locale)}`;
+    const locale = isEN ? "en" : "ko";
+    const sep = baseLink.includes("?") ? "&" : "?";
+    const payUrl = `${baseLink}${sep}locale=${encodeURIComponent(locale)}`;
 
-  // 1) 새 탭 시도
-  const w = window.open(payUrl, "_blank", "noopener,noreferrer");
-
-  // 2) 팝업 차단 시 같은 탭으로 이동 (모바일/사파리 대응)
-  if (!w) {
-    window.location.href = payUrl;
-  }
-});
-
-
+    const w = window.open(payUrl, "_blank", "noopener,noreferrer");
+    if (!w) window.location.href = payUrl;
+  });
 
   chkPaid.addEventListener('change', setSubmitEnabled);
   birthTime.addEventListener('change', handleBirthTimeUI);
@@ -578,17 +561,8 @@ guess_notice_text: "These 10 questions help estimate your birth time. Please ans
       alert(window.t("alert_need_pay"));
       return;
     }
-
-    // If action is "#", just show payload in console (replace with Formspree/back-end)
-    if (form.getAttribute("action") === "#") {
-      e.preventDefault();
-      const data = new FormData(form);
-      const obj = {};
-      data.forEach((v,k)=>obj[k]=v);
-      console.log("Form payload:", obj);
-      alert("OK. Payload printed to console. Connect Formspree/back-end to submit.");
-    }
   });
+
   // ===== Birth date auto-format (YYYY-MM-DD) =====
   const birthDateInput = document.getElementById("birth_date");
 
