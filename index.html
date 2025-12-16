@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>EVE Saju Analysis</title>
 
-<!-- ✅ Safety #1: 캐시 억제(가능한 범위에서) -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
-
 <style>
   body { font-family: sans-serif; background:#fafafa; padding:20px; }
   h1 { text-align:center; color:#065f46; margin-bottom:6px; }
   .subtitle { text-align:center; color:#6b7280; margin-top:0; margin-bottom:14px; font-size:14px; }
+
+  .point-of-no-return{
+    text-align:center;
+    color:#6b7280;
+    font-size:13px;
+    font-style:italic;
+    margin:4px 0 18px 0;
+  }
+
   .section { background:#fff; padding:20px; border-radius:14px; border:1px solid #e5e7eb; margin-bottom:20px; }
   label { font-weight:600; display:block; margin-bottom:6px; }
   input, select, textarea {
@@ -52,14 +56,6 @@
   .langbar{display:flex; justify-content:center; gap:8px; margin:10px 0 18px;}
   .langbtn{padding:8px 12px; border-radius:999px; border:1px solid #d1d5db; background:#fff; cursor:pointer; font-weight:800;}
   .langbtn.active{border-color:#10b981; color:#065f46; background:#ecfdf5;}
-
-  .point-of-no-return{
-    text-align:center;
-    color:#6b7280;
-    font-size:13px;
-    font-style:italic;
-    margin:4px 0 18px 0;
-  }
 </style>
 </head>
 
@@ -86,7 +82,7 @@
   <div class="section">
     <div class="inline" style="justify-content:space-between;">
       <div class="pill" data-i18n="pill_lang">Korean/English</div>
-      <div class="muted" style="margin:0;" data-i18n="pill_hint">같은 형식 • 텍스트만 전환</div>
+      <div class="muted" style="margin:0;" data-i18n="pill_hint">Same layout • Text switches only</div>
     </div>
 
     <label for="name" data-i18n="label_name">성함</label>
@@ -118,6 +114,7 @@
           required
         />
       </div>
+
       <div class="col">
         <label for="birth_time" data-i18n="label_birth_time">출생 시간</label>
         <select id="birth_time" name="birth_time" required>
@@ -133,7 +130,7 @@
           <option value="21:00">21:00</option><option value="22:00">22:00</option><option value="23:00">23:00</option>
         </select>
         <p class="muted" data-i18n="hint_time_unknown">
-          시간 모름을 선택하면 아래 추정 문항 10개에 반드시 답해야 제출됩니다.
+          시간 모름을 선택하면 아래 시주 추정 문항 10개에 반드시 답해야 제출됩니다.
         </p>
       </div>
     </div>
@@ -154,7 +151,7 @@
   <div class="section hidden" id="guess-section">
     <div class="notice" style="margin-bottom:14px;">
       <b data-i18n="guess_notice_bold">시간 모름:</b>
-      <span data-i18n="guess_notice_text">아래 10문항은 출생 시간 추정에 사용됩니다. 모두 답해주세요.</span>
+      <span data-i18n="guess_notice_text">아래 10문항은 시주 추정에 사용됩니다. 모두 답해주세요.</span>
     </div>
 
     <!-- Q1 -->
@@ -290,12 +287,9 @@
   </div>
 
 </form>
-
-<!-- ✅ Safety #3: build stamp (수정할 때 숫자만 올리면 “최신 확인” 쉬움) -->
-<!-- build: 2025-12-15-01 -->
-
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // ====== quick sanity check (페이지에서 JS 살아있는지 1초 만에 확인) ======
   console.log("[EVE] JS loaded ✅");
 
   // ✅ LIVE Stripe Payment Links
@@ -313,6 +307,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const btnKR = document.getElementById("btnKR");
   const btnEN = document.getElementById("btnEN");
+
+  // --- 요소가 하나라도 없으면(HTML 일부가 잘못 붙었을 때) 여기서 바로 멈춰서 알려줌 ---
+  if (!form || !birthTime || !guess || !submitBtn || !chkPaid || !paidHidden || !btnPay || !btnKR || !btnEN) {
+    console.error("[EVE] Missing element(s). Check IDs in HTML.");
+    alert("페이지 구성요소(ID)가 일부 누락되었습니다. HTML이 온전히 저장/배포되었는지 확인하세요.");
+    return;
+  }
 
   // ---------- i18n ----------
   const I18N = {
@@ -344,81 +345,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       guess_notice_bold: "시간 모름:",
       guess_notice_text: "아래 10문항은 출생 시간 추정에 사용됩니다. 모두 답해주세요.",
-
-      q1:"1) 내 인생의 기본 모드(디폴트)는…",
-      q1_a:"깊은 집중/전략/고독, 밤에 강함", q1_b:"부드럽지만 꾸준한 성장, 루틴/정돈", q1_c:"대담한 가시성/리더십, 속전속결", q1_d:"날카로운 판단/기준, ‘정확·깔끔’",
-      q2:"2) 생산성이 가장 잘 나오는 시간대는…",
-      q2_a:"심야/모두 잠든 뒤", q2_b:"이른 아침/조용한 시작", q2_c:"한낮/현장이 뜨거울 때", q2_d:"저녁/정리·마감 시간",
-      q3:"3) 스트레스를 받으면 나는…",
-      q3_a:"숨고 분석한다(비공개)", q3_b:"민감해지고 평화를 찾는다(충돌 회피)", q3_c:"바로 부딪히고 ‘지금 해결’", q3_d:"비판/수정/규칙을 더 엄격히",
-      q4:"4) 인간관계에서 나는…",
-      q4_a:"적지만 깊게, 충성/의리", q4_b:"따뜻하게 보살피고 말에 조심", q4_c:"열정/직진, 에너지와 속도", q4_d:"기준이 높고 ‘예의/존중’ 중요",
-      q5:"5) 돈에 대한 내 스타일은…",
-      q5_a:"정보/타이밍 기반 장기전", q5_b:"저축/안정, 점진적 성장", q5_c:"크게 베팅, 기회 오면 빠르게", q5_d:"예산·정산 철저, 낭비 싫음",
-      q6:"6) 내 집/책상 상태는 보통…",
-      q6_a:"프라이빗, 내 셋업 건드리면 싫음", q6_b:"아늑·편안, 분위기 중시", q6_c:"바쁘고 역동적, 도구가 늘 준비됨", q6_d:"정리/라벨/미감, ‘정돈’이 기본",
-      q7:"7) 새로 배울 때 나는…",
-      q7_a:"혼자 깊게 파고 이론부터 마스터", q7_b:"단계적으로 반복하며 익힘", q7_c:"손으로 부딪히며 빠른 피드백", q7_d:"표준/베스트프랙티스, ‘정석’ 선호",
-      q8:"8) 사람들이 나를 흔히 이렇게 말한다…",
-      q8_a:"신비/사색/속을 잘 안 보임", q8_b:"친절/섬세/감정이 세밀함", q8_c:"자신감/에너지/강한 추진", q8_d:"까다로움/정확/기준이 높음",
-      q9:"9) 내 ‘승리 조건’은 보통…",
-      q9_a:"정보·타이밍을 쥐는 것", q9_b:"조화 유지 + 꾸준한 성장", q9_c:"열기·주목·결단의 실행", q9_d:"정교화·최적화·완성도",
-      q10:"10) 하나만 고르라면 나는…",
-      q10_a:"겨울/자정/물의 기운", q10_b:"봄/새벽/나무의 기운", q10_c:"여름/정오/불의 기운", q10_d:"가을/해질녘/금속의 기운",
-
-      label_topic: "어떤 주제를 중심으로 볼까요?",
-      opt_overall: "종합",
-      opt_career: "직업/사업",
-      opt_money: "재물",
-      opt_relationship: "연애/결혼",
-      opt_health: "건강/기운",
-      opt_timing: "시기/운",
-
-      label_message: "질문/배경(가능한 자세히)",
-      ph_message: "현재 상황, 고민, 확인하고 싶은 포인트를 적어주세요.",
-
-      pay_title: "결제",
-      pay_desc: "결제 완료 후 체크박스를 선택해야 제출 버튼이 활성화됩니다.",
-      btn_pay: "결제 링크 열기",
-      chk_paid: "결제를 완료했습니다.",
-
-      btn_submit: "분석 요청",
-      btn_reset: "초기화",
-
-      alert_need_guess: "출생 시간이 ‘시간 모름’입니다. 추정 문항 10개를 모두 답한 후 제출해 주세요.",
-      alert_need_pay: "결제를 완료한 뒤 확인 체크를 해주세요.",
-      alert_need_link: "Stripe 결제 링크(KR/EN)를 코드에 먼저 넣어 주세요."
-    },
-
-    en: {
-      title: "Saju Consultation Request — EVE Saju Analysis",
-      subtitle: "— (The Path Given to You) —",
-      point_of_no_return: "An irreversible analysis begins.",
-
-      pill_lang: "Korean/English",
-      pill_hint: "Same layout • Text switches only",
-
-      label_name: "Full Name", ph_name: "Your name",
-      label_email: "Email", ph_email: "you@example.com",
-      label_phone: "Phone (optional)", ph_phone: "+1 (xxx) xxx-xxxx",
-
-      label_birth_date: "Birth Date",
-      label_birth_time: "Birth Time",
-      opt_select: "Select…",
-      opt_unknown: "Unknown",
-      hint_time_unknown: "If you choose Unknown, you must answer all 10 questions below.",
-
-      label_birth_place: "Birth Place (City / Country)",
-      ph_birth_place: "e.g., Seoul, South Korea",
-
-      label_gender: "Gender",
-      opt_female: "Female",
-      opt_male: "Male",
-      opt_other: "Other / Prefer not to say",
-
-      guess_notice_bold: "Birth time unknown:",
-      guess_notice_text: "These 10 questions help estimate your birth time. Please answer all.",
-
       q1:"1) My default mode in life is…",
       q1_a:"Deep focus / strategy / solitude; strong at night",
       q1_b:"Gentle but steady growth; routines and order",
@@ -479,6 +405,59 @@ document.addEventListener("DOMContentLoaded", () => {
       q10_c:"Summer / noon / fire vibe",
       q10_d:"Autumn / sunset / metal vibe",
 
+      label_topic: "어떤 주제를 중심으로 볼까요?",
+      opt_overall: "종합",
+      opt_career: "직업/사업",
+      opt_money: "재물",
+      opt_relationship: "연애/결혼",
+      opt_health: "건강/기운",
+      opt_timing: "시기/운",
+
+      label_message: "질문/배경(가능한 자세히)",
+      ph_message: "현재 상황, 고민, 확인하고 싶은 포인트를 적어주세요.",
+
+      pay_title: "결제",
+      pay_desc: "결제 완료 후 체크박스를 선택해야 제출 버튼이 활성화됩니다.",
+      btn_pay: "결제 링크 열기",
+      chk_paid: "결제를 완료했습니다.",
+
+      btn_submit: "분석 요청",
+      btn_reset: "초기화",
+
+      alert_need_guess: "출생 시간이 ‘시간 모름’입니다. 추정 문항 10개를 모두 답한 후 제출해 주세요.",
+      alert_need_pay: "결제를 완료한 뒤 확인 체크를 해주세요.",
+      alert_need_link: "Stripe 결제 링크(KR/EN) 두 개를 PAYMENT_LINK_KR / PAYMENT_LINK_EN에 붙여넣어 주세요."
+    },
+
+    en: {
+      title: "Saju Consultation Request — EVE Saju Analysis",
+      subtitle: "— (The Path Given to You) —",
+      point_of_no_return: "An irreversible analysis begins.",
+
+      pill_lang: "Korean/English",
+      pill_hint: "Same layout • Text switches only",
+
+      label_name: "Full Name", ph_name: "Your name",
+      label_email: "Email", ph_email: "you@example.com",
+      label_phone: "Phone (optional)", ph_phone: "+1 (xxx) xxx-xxxx",
+
+      label_birth_date: "Birth Date",
+      label_birth_time: "Birth Time",
+      opt_select: "Select…",
+      opt_unknown: "Unknown",
+      hint_time_unknown: "If you choose Unknown, you must answer all 10 questions below.",
+
+      label_birth_place: "Birth Place (City / Country)",
+      ph_birth_place: "e.g., Seoul, South Korea",
+
+      label_gender: "Gender",
+      opt_female: "Female",
+      opt_male: "Male",
+      opt_other: "Other / Prefer not to say",
+
+      guess_notice_bold: "Birth time unknown:",
+      guess_notice_text: "These 10 questions help estimate your birth time. Please answer all.",
+
       label_topic: "What would you like to focus on?",
       opt_overall: "Overall reading",
       opt_career: "Career / Business",
@@ -500,12 +479,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       alert_need_guess: "Birth time is set to Unknown. Please answer all 10 questions before submitting.",
       alert_need_pay: "Please complete payment and check the confirmation box to submit.",
-      alert_need_link: "Please paste both Stripe Payment Links into the code first."
+      alert_need_link: "Please paste both Stripe Payment Links into PAYMENT_LINK_KR and PAYMENT_LINK_EN."
     }
   };
 
   let LANG = "kr";
-  function t(key){ return (I18N[LANG] && I18N[LANG][key]) ? I18N[LANG][key] : key; }
+
+  function t(key) {
+    return (I18N[LANG] && I18N[LANG][key]) ? I18N[LANG][key] : key;
+  }
 
   function applyI18n(lang){
     LANG = lang;
@@ -514,13 +496,11 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
       if (dict[key] != null) el.textContent = dict[key];
-      else el.textContent = `[[${key}]]`; // ✅ Safety #2: 키 누락을 “즉시 눈에 보이게”
     });
 
     document.querySelectorAll("[data-i18n-ph]").forEach(el => {
       const key = el.getAttribute("data-i18n-ph");
       if (dict[key] != null) el.setAttribute("placeholder", dict[key]);
-      else el.setAttribute("placeholder", `[[${key}]]`);
     });
 
     document.documentElement.lang = (lang === "kr") ? "ko" : "en";
@@ -533,16 +513,21 @@ document.addEventListener("DOMContentLoaded", () => {
     btnOff.setAttribute("aria-pressed","false");
   }
 
+  btnKR.addEventListener("click", () => { applyI18n("kr"); setActive(btnKR, btnEN); });
+  btnEN.addEventListener("click", () => { applyI18n("en"); setActive(btnEN, btnKR); });
+
   // ---------- Payment checkbox gating ----------
   function setSubmitEnabled() {
     const paidOk = chkPaid.checked;
     submitBtn.disabled = !paidOk;
     paidHidden.value = paidOk ? "yes" : "no";
   }
+  chkPaid.addEventListener('change', setSubmitEnabled);
 
   // ---------- Unknown time => require all 10 answers ----------
   function setGuessRequired(isRequired) {
-    guess.querySelectorAll('.radio-wrap[data-required="1"]').forEach(wrap => {
+    const wraps = guess.querySelectorAll('.radio-wrap[data-required="1"]');
+    wraps.forEach(wrap => {
       wrap.querySelectorAll('input[type="radio"]').forEach(r => r.required = isRequired);
     });
   }
@@ -553,17 +538,22 @@ document.addEventListener("DOMContentLoaded", () => {
     setGuessRequired(unknown);
   }
 
+  birthTime.addEventListener('change', handleBirthTimeUI);
+
   function allGuessAnswered() {
     const groups = ["g_q1","g_q2","g_q3","g_q4","g_q5","g_q6","g_q7","g_q8","g_q9","g_q10"];
     return groups.every(g => !!form.querySelector(`input[name="${g}"]:checked`));
   }
 
-  // ---------- Payment link open (popup fallback) ----------
+  // ---------- Pay button (popup fallback) ----------
   btnPay.addEventListener('click', () => {
     const isEN = (LANG === "en");
     const baseLink = isEN ? PAYMENT_LINK_EN : PAYMENT_LINK_KR;
 
-    if (!baseLink) { alert(t("alert_need_link")); return; }
+    if (!baseLink) {
+      alert(t("alert_need_link"));
+      return;
+    }
 
     const locale = isEN ? "en" : "ko";
     const sep = baseLink.includes("?") ? "&" : "?";
@@ -573,36 +563,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!w) window.location.href = payUrl;
   });
 
-  // ---------- birth date auto hyphen ----------
-  const birthDateInput = document.getElementById("birth_date");
-  function formatYYYYMMDD(value) {
-    const digits = value.replace(/\D/g, "").slice(0, 8);
-    const y = digits.slice(0, 4);
-    const m = digits.slice(4, 6);
-    const d = digits.slice(6, 8);
-    if (digits.length <= 4) return y;
-    if (digits.length <= 6) return `${y}-${m}`;
-    return `${y}-${m}-${d}`;
-  }
-  if (birthDateInput) {
-    birthDateInput.addEventListener("input", (e) => {
-      const before = e.target.value;
-      e.target.value = formatYYYYMMDD(e.target.value);
-      try {
-        const diff = e.target.value.length - before.length;
-        const pos = Math.max(0, (e.target.selectionStart || e.target.value.length) + diff);
-        e.target.setSelectionRange(pos, pos);
-      } catch (_) {}
-    });
-  }
+  // ---------- Submit guard ----------
+  form.addEventListener('submit', (e) => {
+    if (birthTime.value === "unknown" && !allGuessAnswered()) {
+      e.preventDefault();
+      alert(t("alert_need_guess"));
+      guess.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
 
-  // ---------- events ----------
-  chkPaid.addEventListener('change', setSubmitEnabled);
-  birthTime.addEventListener('change', handleBirthTimeUI);
+    if (!chkPaid.checked) {
+      e.preventDefault();
+      alert(t("alert_need_pay"));
+      return;
+    }
+  });
 
-  btnKR.addEventListener("click", () => { applyI18n("kr"); handleBirthTimeUI(); setActive(btnKR, btnEN); });
-  btnEN.addEventListener("click", () => { applyI18n("en"); handleBirthTimeUI(); setActive(btnEN, btnKR); });
-
+  // ---------- Reset ----------
   form.addEventListener('reset', () => {
     setTimeout(() => {
       chkPaid.checked = false;
@@ -611,19 +588,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 0);
   });
 
-  form.addEventListener('submit', (e) => {
-    if (birthTime.value === "unknown" && !allGuessAnswered()) {
-      e.preventDefault();
-      alert(t("alert_need_guess"));
-      guess.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-    if (!chkPaid.checked) {
-      e.preventDefault();
-      alert(t("alert_need_pay"));
-      return;
-    }
-  });
+  // ===== Birth date auto-format (YYYY-MM-DD) =====
+  const birthDateInput = document.getElementById("birth_date");
+
+  function formatYYYYMMDD(value) {
+    const digits = value.replace(/\D/g, "").slice(0, 8);
+    const y = digits.slice(0, 4);
+    const m = digits.slice(4, 6);
+    const d = digits.slice(6, 8);
+
+    if (digits.length <= 4) return y;
+    if (digits.length <= 6) return `${y}-${m}`;
+    return `${y}-${m}-${d}`;
+  }
+
+  if (birthDateInput) {
+    birthDateInput.addEventListener("input", (e) => {
+      const before = e.target.value;
+      e.target.value = formatYYYYMMDD(e.target.value);
+
+      // 모바일에서 커서 튐 방지(try-catch)
+      try {
+        const diff = e.target.value.length - before.length;
+        const pos = Math.max(0, (e.target.selectionStart || e.target.value.length) + diff);
+        e.target.setSelectionRange(pos, pos);
+      } catch (_) {}
+    });
+  }
 
   // init
   applyI18n(LANG);
@@ -631,6 +622,8 @@ document.addEventListener("DOMContentLoaded", () => {
   handleBirthTimeUI();
 });
 </script>
+
+
 
 </body>
 </html>
